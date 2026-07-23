@@ -139,3 +139,14 @@ the metadata tag filling is decided like this:
 - track number, is going to be the position (index) of the track in the playlist, and the first part of the file name. After that it places " - " and the title written in the title tag.
 
 You can check Screenshot_1.png, taken on File Explorer in W11.
+
+***
+
+## Known limitations:
+
+- Featured artists may create separate artist folders.
+- Genre metadata depends on what YouTube provides.
+- Album artwork quality depends on the uploaded thumbnail.
+
+> Comments: most of the limitations come from the lack of YouTube metadata. This is most easily solved with a metadata editor like Mp3tag once we have gathered all we could from YT. The yt-dlp configuration file then provides a solid base to work on for track libraries, especially big ones.
+> The first problem (the featured artists one) can be tackled by renaming the main folder with the main artist name, at least on Windows 11, essentially merging the folders in one, combining the files into the expected directory structure.
