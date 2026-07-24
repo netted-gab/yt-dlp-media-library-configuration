@@ -49,11 +49,13 @@ If placed in the same folder as yt-dlp executable, and depending on the version,
 
 Example output:
 
+```text
 Artist/
 └── Album/
     ├── 01 - Song.m4a
     ├── 02 - Song.m4a
     └── cover.jpg
+```
 
 This is how the file should appear in the folder. Check Screenshot_1.png.
 It will create a main folder named "Artist name", a subfolder named "Album name", and the whole playlist you downloaded inside.
