@@ -103,6 +103,7 @@ this prevents files that are in the same folder with the same name to be overwri
 As explained in the conf file, it simply copies the track position in the playlist into the metadata tag: track, which namely is the track number.
 We trust YT on placing them in the correct order as the Artist intended.
 
+```bash
 --replace-in-metadata title "(?i)\s*[\(\[]Official Music Video[\)\]]" ""
 --replace-in-metadata title "(?i)\s*[\(\[]Official Video[\)\]]" ""
 --replace-in-metadata title "(?i)\s*[\(\[]Official Lyric Video[\)\]]" ""
@@ -112,6 +113,7 @@ We trust YT on placing them in the correct order as the Artist intended.
 --replace-in-metadata title "(?i)\s*[\(\[]Lyrics[\)\]]" ""
 --replace-in-metadata title "(?i)\s*[\(\[]Visualizer[\)\]]" ""
 --replace-in-metadata title "(?i)\s*[\(\[]Visualiser[\)\]]" ""
+```
 
 These options remove common phrases used in youtube titles. Such as "Official Video" or "Lyric Video".
 
