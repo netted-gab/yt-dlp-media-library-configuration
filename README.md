@@ -31,6 +31,34 @@ note on Node.js: It is not required to download from most YouTube videos or play
 
 ***
 
+## YouTube PO Tokens
+
+Some YouTube clients may require a GVS PO Token. When this happens, yt-dlp may report errors such as HTTP 403 or `Requested format is not available`.
+
+This configuration supports automatic PO Token generation through the `bgutil-ytdlp-pot-provider` plugin and its `script-node` method.
+
+### Additional requirements
+
+- bgutil-ytdlp-pot-provider
+-  Node.js 20+ (if using `--js-runtimes node` and/or the bgutil PO Token configuration)
+- bgutil-ytdlp-pot-provider (if YouTube requires a GVS PO Token)
+
+The `generate_once.js` script provided by bgutil is used to generate the required PO Token when needed. The plugin itself is kept separate from yt-dlp and must be installed/configured according to the bgutil project instructions.
+
+### Configuration
+
+The following options are included in `yt-dlp.conf`:
+
+```text
+--extractor-args "youtubepot-bgutilscript:script_path=PATH_TO_BGUTIL\server\build\generate_once.js"
+--extractor-args "youtube:player-client=mweb"
+```
+
+### IMPORTANT:
+PATH_TO_BGUTIL is a placeholder. Replace it with the actual path to your bgutil-ytdlp-pot-provider directory on your machine.
+
+***
+
 ## Installation
 
 Copy `yt-dlp.conf` wherever you want to keep your yt-dlp configuration.
@@ -122,7 +150,7 @@ These options remove common phrases used in youtube titles. Such as "Official Vi
 This tells yt-dlp to embed the metadata to the file we are downloading.
 
 --embed-thumbnail
---convert-thumbnails jpg
+--convert-thumbnail jpg
 
 This acquires the thumbnail and the next line converts it as jpg.
 
