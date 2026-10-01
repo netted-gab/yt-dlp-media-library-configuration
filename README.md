@@ -2,7 +2,7 @@ Summary:
 
 A yt-dlp configuration for downloading music albums from YouTube or YT Music with:
 
-- preferred audio format (e.g. m4a)
+- preferred audio format (e.g. Opus)
 - embedded cover art
 - embedded metadata
 - cleaner titles
@@ -11,7 +11,15 @@ A yt-dlp configuration for downloading music albums from YouTube or YT Music wit
 
 ***
 
-The repository provides a documented yt-dlp configuration for downloading and organizing music from YouTube and YouTube Music. It's intended as a starting point or a blueprint you can tailor to your or your machine's needs.
+The repository provides a yt-dlp configuration for downloading and organizing music, from YouTube but, especially, as it works really well (01/10/2026), for YouTube Music.
+Being fairly simple and linear, it should be easily customizable, tailored to the needs of your machines, devices, players you listen music on.
+
+Tips:
+
+1. using yt music links works best, particularly for the album cover
+2. you can amass multiple links (of multiple albums) in a .txt file, one for every row, and call the .txt instead. Queuing the whole thing
+4. placing the file in your yt-dlp directory SHOULD automatically make it recognisable as the configuration file. If it doesn't work, call it via terminal. If there is another config file being used automatically you can:
+--ignore-config --config-location "C:\user\...(where you placed the config file)"
 
 ***
 
@@ -22,40 +30,12 @@ The repository provides a documented yt-dlp configuration for downloading and or
 
 ***
 
-## Optional:
+## Optional (in theory):
 
 - Firefox (if using `--cookies-from-browser firefox`)
 - Node.js (if using `--js-runtimes node`)
 
-note on Node.js: It is not required to download from most YouTube videos or playlists, but I found it useful in multiple occasions when yt-dlp needed to execute JavaScript to work around certain YouTube changes or anti-bot mechanisms.
-
-***
-
-## YouTube PO Tokens
-
-Some YouTube clients may require a GVS PO Token. When this happens, yt-dlp may report errors such as HTTP 403 or `Requested format is not available`.
-
-This configuration supports automatic PO Token generation through the `bgutil-ytdlp-pot-provider` plugin and its `script-node` method.
-
-### Additional requirements
-
-- bgutil-ytdlp-pot-provider
--  Node.js 20+ (if using `--js-runtimes node` and/or the bgutil PO Token configuration)
-- bgutil-ytdlp-pot-provider (if YouTube requires a GVS PO Token)
-
-The `generate_once.js` script provided by bgutil is used to generate the required PO Token when needed. The plugin itself is kept separate from yt-dlp and must be installed/configured according to the bgutil project instructions.
-
-### Configuration
-
-The following options are included in `yt-dlp.conf`:
-
-```text
---extractor-args "youtubepot-bgutilscript:script_path=PATH_TO_BGUTIL\server\build\generate_once.js"
---extractor-args "youtube:player-client=mweb"
-```
-
-### IMPORTANT:
-PATH_TO_BGUTIL is a placeholder. Replace it with the actual path to your bgutil-ytdlp-pot-provider directory on your machine.
+Because there are many different ways to bypass YouTube anti-bot mechanisms. This were the easiest I could find.
 
 ***
 
@@ -68,7 +48,7 @@ Copy `yt-dlp.conf` wherever you want to keep your yt-dlp configuration.
 ## Usage
 
 ```bash
-yt-dlp --config-location yt-dlp.conf URL
+yt-dlp --config-location "C:\...\.conf folder location" URL
 ```
 
 If placed in the same folder as yt-dlp executable, and depending on the version, you may not need to call the configuration. If you store the configuration file in another folder you'll need to call for it.
@@ -80,58 +60,109 @@ Example output:
 ```text
 Artist/
 └── Album/
-    ├── 01 - Song.m4a
-    ├── 02 - Song.m4a
+    ├── 01 - Song.opus
+    ├── 02 - Song.opsu
     └── cover.jpg
 ```
 
 This is how the file should appear in the folder. Check Screenshot_1.png.
 It will create a main folder named "Artist name", a subfolder named "Album name", and the whole playlist you downloaded inside.
 
-note: the actual cover will be temporarily stored only. So, if you look inside the folder before the download is completed you may see it being saved (as a jpg file) and then disappear. It's actually in the metadata of each one of the tracks. (you can check with metadata editor like Mp3tag)
+note on Screenshot_1.png:
+as I moved my library from m4a to opus, Windows 11 File Explorer stopped recognizing track indexes and various tags. Check your device, or preferred player, for file compression and metadata compatibility (older machines might need mp3).
 
 ***
 
 --cookies-from-browser firefox
 
-YouTube uses cookies to identify browser sessions and reusing your own browser cookies allows yt-dlp to make requests with the same authentication you have. It basically allows access to content your account is permitted to view. (If you are not logged in it's still using the ones you are storing as a temporary user of YT platforms)
+YouTube uses cookies to identify browser sessions. Reusing your own browser cookies allows yt-dlp to make requests with the same authentication you have. It basically allows access to the content YOUR account is permitted to view. (If you are not logged in it's still using the ones you are storing as a temporary user of YT platforms)
 
 ***
 
 --js-runtimes node
 
-As stated before you don't need this for the majority of downloads.
+Documentation says it is not required to download most from YouTube videos. I found it essential in almost every occasion. It makes yt-dlp execute JavaScript to work around certain YouTube changes or anti-bot mechanisms.
 
 ***
 
---format bestaudio
+--extractor-args "youtube:player-client=web_embedded,tv,web"
 
-select the best audio quality available from the file we are about to download.
+Choose from which client you want yt-dlp to check for the preferred audio format. Here I choose: web_embedded, tv, web; which is a configuration that works with the initial part of the script. Most of the other ones will need the implementation of Tokens, and android and ios clients might work without cookies (not tested).
+
+***
+
+--format "bestaudio/best"
+
+Look for the best audio track. If there is no audio track, look for the best video-audio combined (ffmpeg is needed to separate them).
 
 --extract-audio
 
-extract said audio.
+Extract the audio from the file (ffmpeg is used if installed)
 
---audio-format m4a
+--audio-format opus
 
-this defines the new format we want to save the audio into. This is where you want ffmpeg installed to make it work.
+Forces the convertion to the desired format (Opus). If the original audio is already an .opus (most common) it will directly be saved without quality loss. Obviusly, if it's not .opus, it will be recoded (potential quality loss).
 
 --continue
 
-this tells yt-dlp to not stop and restart on connection lost. It should be useless on newer versions of yt-dlp but I'd keep it any case.
+Mhis tells yt-dlp to not stop and restart on connection lost. It should be useless on newer versions of yt-dlp but I'd keep it any case.
 
---no-overwrites
+--format-sort "abr"
 
-this prevents files that are in the same folder with the same name to be overwritten.
+Modify the order from which we choose the best format. Give priority to the Avarage Bitrate (abr), the highest mean bitrate expressed in kbps.
 
 ***
 
---parse-metadata "playlist_index:%(track_number)s"
+--embed-thumbnail
 
-As explained in the conf file, it simply copies the track position in the playlist into the metadata tag: track, which namely is the track number.
-We trust YT on placing them in the correct order as the Artist intended.
+Acquire the thumbnail as cover (in YT Music it's the actual cover)
 
-```bash
+--write-thumbnail
+
+Save the Cover in the folder
+
+--convert-thumbnails jpg
+
+Convert it in jpg
+
+# Crop squared 1:1 and conversion to yuv420p
+--ppa "ThumbnailsConvertor+ffmpeg:-vf crop=ih:ih,format=yuv420p"
+
+Crop the Cover in a 1:1 format.
+Convert the color format into one that the majority of the portable reader can show. Note that some of the artworks may appear different, as it happened once to me, for an especially dark image.
+
+***
+
+--replace-in-metadata uploader "(?i)\s*-\s*Topic$" ""
+
+Remove "- Topic" from the channell name
+
+--parse-metadata "%(artist)s|%(uploader)s:^(?:NA|None|)\s*\|(?P<artist>.+)$"
+
+Copy the uploader tag in the artist tag if artist is empty
+
+--parse-metadata "%(playlist_index)s:%(track_number)s"
+
+Assign indexes to tracks following the playlist order (as it should follow the album)
+
+--parse-metadata "%(playlist_title)s:%(album)s"
+
+Copy playlist title into album tag
+
+--replace-in-metadata album "(?i)^(?:Album|EP|Single)\s*-\s*" ""
+--replace-in-metadata playlist_title "(?i)^(?:Album|EP|Single)\s*-\s*" ""
+
+Remove the prefixes: ("Album - ", "EP - ", "Single - ").
+Depending on your taste you might want to, instead, keep them.
+
+--parse-metadata "%(artist)s|%(title)s:^\s*\|(?P<artist>.+?)\s+-\s+(?P<title>.+)$"
+
+When the track is named "artist - name_of_the_track" it chooses the first part as artist and the rest as the name of the track. This was needed in some occasions when the title of the track had " - " in the name. It shouldn't go in conflict with most artist names that have "-" in the name, as it's usually not spaced, such as: Alt-J.
+
+--replace-in-metadata artist "(?i)\s*(?:,|\s+&\s+|\s+x\s+|\s+feat\.\s+|\s+ft\.\s+).*" ""
+
+Force the primary artist to be the only one in the tag (removes feat., commas, etc.)
+
 --replace-in-metadata title "(?i)\s*[\(\[]Official Music Video[\)\]]" ""
 --replace-in-metadata title "(?i)\s*[\(\[]Official Video[\)\]]" ""
 --replace-in-metadata title "(?i)\s*[\(\[]Official Lyric Video[\)\]]" ""
@@ -141,44 +172,33 @@ We trust YT on placing them in the correct order as the Artist intended.
 --replace-in-metadata title "(?i)\s*[\(\[]Lyrics[\)\]]" ""
 --replace-in-metadata title "(?i)\s*[\(\[]Visualizer[\)\]]" ""
 --replace-in-metadata title "(?i)\s*[\(\[]Visualiser[\)\]]" ""
-```
 
-These options remove common phrases used in youtube titles. Such as "Official Video" or "Lyric Video".
+Clean some superfluous wording.
 
 --add-metadata
 
-This tells yt-dlp to embed the metadata to the file we are downloading.
-
---embed-thumbnail
---convert-thumbnail jpg
-
-This acquires the thumbnail and the next line converts it as jpg.
+Incorporate the metadatas acquired in the file.
 
 --windows-filenames
 
-This is for windows users or if you are downloading on a hard drive with NTFS or FAT32/exFAT formatting. It checks the file for characters that aren't welcome in windows and may stop your storing or break the file. Linux and Mac have more flexibilities on this and shouldn't need the line at all.
+Force Windows rules over file name.
+On Windows, for example, you can't name a file or a directory with double dots, like: Fred Again..; with this, you will find it instead as: Fred Again.# but the metadata artist will be correct.
 
 ***
 
--o "%(artist,uploader)s/%(album,playlist_title)s/%(track_number,playlist_index)02d - %(title)s.%(ext)s"
+-o "Libreria/%(artist,uploader)s/%(album,playlist_title)s/%(track_number,playlist_index)02d - %(title)s.%(ext)s"
 
-This is where we stop. It's how and where the file is going to be stored with its metadata.
+Choose how you want to save the file (directory tree). Here: Artist\Album\Track.opus .
 
-the metadata tag filling is decided like this:
+-o "thumbnail:Libreria/%(artist,uploader)s/%(album,playlist_title)s/cover.%(ext)s"
 
-- artist, is going to be the uploader of the file, and the main folder
-- album, is going to be the playlist title, and the subfolder
-- track number, is going to be the position (index) of the track in the playlist, and the first part of the file name. After that it places " - " and the title written in the title tag.
-
-You can check Screenshot_1.png, taken on File Explorer in W11.
+Save a copy of the cover art.
 
 ***
-
 ## Known limitations:
 
-- Featured artists may create separate artist folders.
-- Genre metadata depends on what YouTube provides.
-- Album artwork quality depends on the uploaded thumbnail.
+- Featured artists do not create separate artist folders anymore but the compromise was to simply delete them from artist tag.
+- Most metadata tags are still empty or filled with the confused strings YouTube provide. Such as genre being "music" and year being seemingly random numbers.
+- If downloading from YouTube and not YouTube Music the artwork quality will depend on the uploaded thumbnail.
 
-> Comments: most of the limitations come from the lack of YouTube metadata. This is most easily solved with a metadata editor like Mp3tag once we have gathered all we could from YT. The yt-dlp configuration file then provides a solid base to work on for track libraries, especially big ones.
-> The first problem (the featured artists one) can be tackled by renaming the main folder with the main artist name, at least on Windows 11, essentially merging the folders in one, combining the files into the expected directory structure.
+> Comments: Limitations from the lack of YouTube metadata can be solved with a metadata editor like Mp3tag.
